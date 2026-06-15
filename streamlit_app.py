@@ -105,15 +105,15 @@ def main():
         cols_to_ask = [c for c in sample.columns if c not in ['customerID', 'Churn', 'tenure', 'tenure_bin']]
 
         for col in cols_to_ask:
-            if sample[col].dtype == 'object' or sample[col].dtype.name == 'category':
-                opts = sorted(sample[col].dropna().unique().tolist())
-                user_input[col] = st.selectbox(col, opts)
-            else:
+            if pd.api.types.is_numeric_dtype(sample[col]):
                 # numeric (e.g., SeniorCitizen)
                 minv = int(sample[col].min()) if pd.api.types.is_integer_dtype(sample[col]) else float(sample[col].min())
                 maxv = int(sample[col].max()) if pd.api.types.is_integer_dtype(sample[col]) else float(sample[col].max())
                 default = int(sample[col].median()) if pd.api.types.is_integer_dtype(sample[col]) else float(sample[col].median())
                 user_input[col] = st.number_input(col, value=default, min_value=minv, max_value=maxv)
+            else:
+                opts = sorted(sample[col].dropna().unique().tolist())
+                user_input[col] = st.selectbox(col, opts)
 
         submitted = st.form_submit_button('Predict')
 
